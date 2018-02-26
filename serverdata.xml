@@ -1,0 +1,24 @@
+<computers>
+  <computer name="srv1.lab.net" build="14393">
+    <osversion />
+    <biosserial>VMware-42 0a 05 c4 fa ad 50 7d-ac 0e 03 41 2c 84 42 7c</biosserial>
+    <manufacturer>VMware, Inc.</manufacturer>
+    <manufacturer>VMware, Inc.</manufacturer>
+    <manufacturer>VMware, Inc.</manufacturer>
+    <manufacturer>VMware, Inc.</manufacturer>
+    <manufacturer>VMware, Inc.</manufacturer>
+    <manufacturer>VMware, Inc.</manufacturer>
+    <manufacturer>VMware, Inc.</manufacturer>
+  </computer>
+  <computer name="dc1.lab.net" build="14393">
+    <osversion />
+    <biosserial>VMware-42 0a 05 c4 fa ad 50 7d-ac 0e 03 41 2c 84 42 7c</biosserial>
+    <manufacturer>VMware, Inc.</manufacturer>
+    <manufacturer>VMware, Inc.</manufacturer>
+    <manufacturer>VMware, Inc.</manufacturer>
+    <manufacturer>VMware, Inc.</manufacturer>
+    <manufacturer>VMware, Inc.</manufacturer>
+    <manufacturer>VMware, Inc.</manufacturer>
+    <manufacturer>VMware, Inc.</manufacturer>
+  </computer>
+</computers>
