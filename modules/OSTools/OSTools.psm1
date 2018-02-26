@@ -163,37 +163,3 @@ function checkcomputer {
 
 
 
-function set-computerstate {
-  [CmdletBinding(SupportsShouldProcess=$true,ConfirmImpact='High')]
-    param (
-        [parameter(mandatory=$true,valuefrompipeline=$true)]
-        [string[]]$computername,
-
-        [parameter(mandatory=$true)]
-        [validateset('LogOff','PowerOff','Shutdown','Restart')]
-        [string]$action
-
-        )
-
-    process {
-        foreach($computer in $computername) {
-        
-        switch($action ) {
-            'LogOff' {$x = 0}
-            'Shutdown' {$x = 1}
-            'Restart' {$x = 2}
-            'PowerOff' {$x = 8}
-
-
-        }
-
-        if ($force) {$x += 4}
-        $os = Get-WmiObject -Class win32_operatingsystem -ComputerName $computer -EnableAllPrivileges
-        if($pscmdlet.ShouldProcess("$action $computer")) {
-
-        $os.win32shutdown($x) | Out-Null
-        }
-    }
-
-   
-}
