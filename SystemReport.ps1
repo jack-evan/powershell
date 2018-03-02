@@ -1,4 +1,23 @@
-﻿$css = @"
+﻿[cmdletbinding()]
+param (
+    [parameter(mandatory=$true,valuefrompipeline=$true,valuefrompipelinebypropertyname=$true)]
+    [string[]]$ComputerName,
+
+    [parameter(mandatory=$true)]
+    [string]$outputpath
+
+)
+
+
+begin {
+    if (Test-Path $outputpath) {
+        # exists
+    } else {
+        mkdir $outputpath | Out-Null
+    }
+
+
+$css = @"
 
 body {
     font-family:Tahoma;
@@ -33,56 +52,65 @@ h2:hover {
 
 "@
 
-$frag1 = get-systemdetails -computername dc1.lab.net |
-         ConvertTo-EnhancedHTMLFragment -TableCssID SYSTABLE `
-                                        -DivCssID SYSDIV `
-                                        -DivCssClass WHATEVER `
-                                        -TableCssClass TABLEWHATEVER `
-                                        -As List `
-                                        -Properties * `
-                                        -MakeHiddenSection `
-                                        -PreContent '<h2>System Details</h2>' |
-        Out-String
+}
+
+process {
+    foreach($comp in $ComputerName) {
+
+    $frag1 = get-systemdetails -computername $comp |
+             ConvertTo-EnhancedHTMLFragment -TableCssID SYSTABLE `
+                                            -DivCssID SYSDIV `
+                                            -DivCssClass WHATEVER `
+                                            -TableCssClass TABLEWHATEVER `
+                                            -As List `
+                                            -Properties * `
+                                            -MakeHiddenSection `
+                                            -PreContent '<h2>System Details</h2>' |
+            Out-String
                                         
 
 
-$frag2 = get-diskdetails -computername dc1.lab.net |
-         ConvertTo-EnhancedHTMLFragment -TableCssID DISKTABLE `
-                                        -DivCssID DISKDIV `
-                                        -DivCssClass WHATEVER `
-                                        -TableCssClass TABLEWHATEVER `
-                                        -As Table `
-                                        -Properties * `
-                                        -EvenRowCssClass 'even' `
-                                        -OddRowCssClass 'odd' `
-                                        -MakeHiddenSection `
-                                        -PreContent '<h2>Disks</h2>' |
-        Out-String
+    $frag2 = get-diskdetails -computername $comp |
+             ConvertTo-EnhancedHTMLFragment -TableCssID DISKTABLE `
+                                            -DivCssID DISKDIV `
+                                            -DivCssClass WHATEVER `
+                                            -TableCssClass TABLEWHATEVER `
+                                            -As Table `
+                                            -Properties * `
+                                            -EvenRowCssClass 'even' `
+                                            -OddRowCssClass 'odd' `
+                                            -MakeHiddenSection `
+                                            -PreContent '<h2>Disks</h2>' |
+            Out-String
 
 
-$frag3 = get-process -computername dc1.lab.net |
-         ConvertTo-EnhancedHTMLFragment -TableCssID PROCTABLE `
-                                        -DivCssID PROCDIV `
-                                        -DivCssClass WHATEVER `
-                                        -TableCssClass TABLEWHATEVER `
-                                        -As Table `
-                                        -Properties Name,ID,VM,PM,WS,CPU `
-                                        -EvenRowCssClass 'even' `
-                                        -OddRowCssClass 'odd' `
-                                        -MakeHiddenSection `
-                                        -MakeTableDynamic `
-                                        -PreContent '<h2>Processes</h2>' |
-        Out-String
+    $frag3 = get-process -computername $comp |
+             ConvertTo-EnhancedHTMLFragment -TableCssID PROCTABLE `
+                                            -DivCssID PROCDIV `
+                                            -DivCssClass WHATEVER `
+                                            -TableCssClass TABLEWHATEVER `
+                                            -As Table `
+                                            -Properties Name,ID,VM,PM,WS,CPU `
+                                            -EvenRowCssClass 'even' `
+                                            -OddRowCssClass 'odd' `
+                                            -MakeHiddenSection `
+                                            -MakeTableDynamic `
+                                            -PreContent '<h2>Processes</h2>' |
+            Out-String
                                        
                                        
+    $path = Join-Path -Path $outputpath -ChildPath "$comp.html" 
 
+    ConvertTo-EnhancedHTML -HTMLFragments $frag1,$frag2,$frag3 `
+                           -Title "System Report for $comp" `
+                           -PreContent "<h1>System report for $comp</h1>" `
+                           -PostContent "<br></br>Retrieved $(Get-Date)" `
+                           -CssStyleSheet $css |
 
-ConvertTo-EnhancedHTML -HTMLFragments $frag1,$frag2,$frag3 `
-                       -Title "System Report for DC1.LAB.NET" `
-                       -PreContent "<h1>System report for dc1.lab.net</h1>" `
-                       -PostContent "<br></br>Retrieved $(Get-Date)" `
-                       -CssStyleSheet $css |
+    Out-File $path
 
-Out-File C:\Users\jnunez\Documents\System_Report.html
+    }
 
+}
 
+#how to use: get-adcomputer -filter 'name -like "srv*"' | select -expandperoperty name | systemreport.ps1 -outputpath c:\reports
